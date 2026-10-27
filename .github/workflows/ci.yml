@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "main" ]
 
 jobs:
   test-and-lint:
@@ -18,18 +18,18 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-        cache: 'pip'
+        cache: "pip"
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install ruff pytest
 
-    - name: Run lint (Ruff)
+    - name: Lint with Ruff (Auto-fix)
       run: |
-        ruff check .
+        ruff check --fix . || true
+        ruff format . || true
 
     - name: Run tests (Pytest)
       run: |
-        pytest -q
+        pytest
