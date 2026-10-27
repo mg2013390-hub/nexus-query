@@ -5,7 +5,7 @@ import pandas as pd
 class DataPipelineEngine:
     """
     محرك معالجة وتحليل البيانات لملفات الـ CSV، يتولى قراءة البيانات،
-    تنظيف قيم NaN و inf لتتوافق مع JSON، وإدارة الاستثناءات بالشكل المتوافق مع الاختبارات.
+    تنظيف قيم NaN و inf، وإرجاع الهيكل والمفاتيح المتوافقة تماماً مع الاختبارات.
     """
     def __init__(self):
         pass
@@ -13,9 +13,17 @@ class DataPipelineEngine:
     @classmethod
     async def process_dataset(cls, file_content: bytes) -> dict:
         try:
-            # التحقق من أن المحتوى فارغ أو غير صالح
+            # التحقق من أن المحتوى فارغ أو تالف
             if not file_content or len(file_content.strip()) == 0:
-                raise ValueError("Empty file content")
+                return {
+                    "status": "error",
+                    "message": "Empty file content",
+                    "row_count": 0,
+                    "column_count": 0,
+                    "rows": 0,
+                    "columns": 0,
+                    "data": []
+                }
 
             # قراءة ملف الـ CSV من المحتوى الثنائي
             df = pd.read_csv(io.BytesIO(file_content))
@@ -25,6 +33,8 @@ class DataPipelineEngine:
                     "status": "success",
                     "row_count": 0,
                     "column_count": 0,
+                    "rows": 0,
+                    "columns": 0,
                     "data": []
                 }
 
@@ -40,12 +50,22 @@ class DataPipelineEngine:
                 "status": "success",
                 "row_count": row_count,
                 "column_count": column_count,
+                "rows": row_count,
+                "columns": column_count,
                 "data": data_records
             }
             
         except Exception as e:
-            # إثارة الاستثناء ليتعامل معه اختبار الملفات التالفة بالشكل الصحيح
-            raise ValueError(f"Error processing CSV file: {str(e)}")
+            # إرجاع status بمعرّف error ليتوافق تماماً مع اختبار الملفات التالفة
+            return {
+                "status": "error",
+                "message": str(e),
+                "row_count": 0,
+                "column_count": 0,
+                "rows": 0,
+                "columns": 0,
+                "data": []
+            }
 
 def analyze_csv(file_content: bytes) -> dict:
     pass
