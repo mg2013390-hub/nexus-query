@@ -5,7 +5,7 @@ import pandas as pd
 class DataPipelineEngine:
     """
     محرك معالجة وتحليل البيانات لملفات الـ CSV، يتولى قراءة البيانات،
-    تنظيف قيم NaN و inf المتوافقة مع JSON، وإرجاع النتائج.
+    تنظيف قيم NaN و inf المتوافقة مع JSON، وإرجاع النتائج بالشكل المتوافق مع الاختبارات.
     """
     def __init__(self):
         pass
@@ -19,6 +19,8 @@ class DataPipelineEngine:
             if df.empty:
                 return {
                     "status": "success",
+                    "row_count": 0,
+                    "column_count": 0,
                     "rows": 0,
                     "columns": 0,
                     "data": []
@@ -34,13 +36,22 @@ class DataPipelineEngine:
             
             return {
                 "status": "success",
+                "row_count": rows_count,
+                "column_count": cols_count,
                 "rows": rows_count,
                 "columns": cols_count,
                 "data": data_records
             }
             
         except Exception as e:
-            raise ValueError(f"Error processing CSV file: {str(e)}")
+            # إرجاع status بمعرّف error ليتوافق مع اختبار الملفات التالفة
+            return {
+                "status": "error",
+                "message": str(e),
+                "row_count": 0,
+                "column_count": 0,
+                "data": []
+            }
 
 def analyze_csv(file_content: bytes) -> dict:
     pass
