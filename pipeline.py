@@ -13,7 +13,7 @@ class DataPipelineEngine:
     @classmethod
     async def process_dataset(cls, file_content: bytes) -> dict:
         try:
-            # التحقق من أن المحتوى فارغ أو تالف
+            # التحقق من أن المحتوى فارغ أو تالف لضمان إرجاع status error
             if not file_content or len(file_content.strip()) == 0:
                 return {
                     "status": "error",
