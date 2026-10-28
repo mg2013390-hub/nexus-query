@@ -1,23 +1,26 @@
-# NexusQuery
+# nexus-query
 
-A high-performance FastAPI backend service designed for automated CSV data ingestion, validation, and querying pipelines with full CI/CD compliance and 100% test coverage.
+A lightweight and robust FastAPI service designed for processing and validating tabular CSV data pipelines, backed by automated Pytest coverage and strict Ruff formatting standards.
 
----
+## Architecture & Project Structure
 
-## 🚀 What It Does
-NexusQuery provides robust API endpoints to upload, validate, and process structured datasets (CSV format). It performs real-time data transformations, handles malformed inputs gracefully, and exposes health-check and analysis endpoints for enterprise-grade data management.
+The project follows a clean, modular structure separating API routing from core data pipeline logic:
 
----
+- **`api.py`**: Handles incoming HTTP requests, file upload validation (`UploadFile`), and FastAPI endpoint routing (`/health`, `/api/v1/analyze`).
+- **`pipeline.py`**: Encapsulates data processing logic utilizing Pandas, handling CSV ingestion, empty dataset checks, and custom `PipelineError` exceptions.
+- **`models.py`**: Defines strict Pydantic data models (`AnalyzeResponse`) for request/response serialization and validation.
+- **`test_main.py` & `test_pipeline.py`**: Comprehensive integration and unit test suites ensuring high code quality.
 
-## 📂 Architecture
-The project follows a clean separation of concerns split into two core layers:
-* **`api.py` (FastAPI Layer):** Manages the web routing, HTTP request validation, file upload handlers, and response serialization.
-* **`pipeline.py` (DataPipelineEngine Layer):** Implements the data processing logic, Pandas-based dataframe transformations, cleaning routines, and rigorous error-handling mechanisms.
+## Features
 
----
+- **FastAPI Endpoints:** RESTful endpoints with robust error handling and response validation.
+- **Data Pipeline:** Efficient Pandas-powered tabular data parsing and metrics extraction.
+- **Quality Assurance:** Enforces 94%+ automated test coverage (`pytest-cov`) and strict formatting gates via Ruff and GitHub Actions CI/CD pipelines.
 
-## ⚙️ Installation
-Clone the repository and install the required dependencies within your active Python virtual environment:
+## Environment Configuration
 
-```bash
-pip install -r requirements.txt
+Copy `.env.example` to `.env` to configure environment variables for local development or Docker deployment:
+
+```env
+PORT=8000
+LOG_LEVEL=info
