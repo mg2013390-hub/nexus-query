@@ -1,0 +1,6 @@
+[tool.coverage.run]
+source = ["api", "pipeline"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true

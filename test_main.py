@@ -1,36 +1,29 @@
-import os
-from fastapi import FastAPI, File, HTTPException, UploadFile
-from models import AnalyzeResponse
-from pipeline import PipelineError, process_pipeline
+from fastapi.testclient import TestClient
+from api import app
 
-app = FastAPI()
+client = TestClient(app)
 
 
-@app.get("/health")
-def health_check():
-    return {"status": "healthy"}
+def test_health_check():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "healthy"}
 
 
-@app.post("/api/v1/analyze", response_model=AnalyzeResponse)
-async def analyze_data(file: UploadFile = File(...)):
-    if not file.filename.endswith(".csv"):
-        raise HTTPException(
-            status_code=400, detail="Only CSV file formats are supported."
-        )
+def test_analyze_invalid_file_format():
+    response = client.post(
+        "/api/v1/analyze", files={"file": ("test.txt", b"some,data", "text/plain")}
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Only CSV file formats are supported."}
 
-    temp_file_path = f"temp_{file.filename}"
-    try:
-        contents = await file.read()
-        with open(temp_file_path, "wb") as f:
-            f.write(contents)
 
-        result = process_pipeline(temp_file_path)
-        return AnalyzeResponse(**result)
-
-    except PipelineError as e:
-        return AnalyzeResponse(
-            status="error", row_count=None, column_count=None, message=str(e)
-        )
-    finally:
-        if os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
+def test_analyze_endpoint_empty_csv():
+    empty_csv = "col1,col2\n"
+    response = client.post(
+        "/api/v1/analyze",
+        files={"file": ("empty.csv", empty_csv.encode("utf-8"), "text/csv")},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data.get("status") == "error"

@@ -6,21 +6,16 @@ from pipeline import PipelineError, process_pipeline
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to Nexus Query API"}
-
-
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
 
 
-@app.post("/analyze", response_model=AnalyzeResponse)
+@app.post("/api/v1/analyze", response_model=AnalyzeResponse)
 async def analyze_data(file: UploadFile = File(...)):
     if not file.filename.endswith(".csv"):
         raise HTTPException(
-            status_code=400, detail="Invalid file type. Only CSV files are allowed."
+            status_code=400, detail="Only CSV file formats are supported."
         )
 
     temp_file_path = f"temp_{file.filename}"
