@@ -25,10 +25,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-lock.txt
 
-    - name: Lint with Ruff (Auto-fix)
+   - name: Lint with Ruff
       run: |
-        ruff check --fix . || true
-        ruff format . || true
+        ruff check .
+
+    - name: Check code formatting
+      run: |
+        ruff format --check .
 
     - name: Run tests (Pytest)
       run: |
