@@ -1,18 +1,23 @@
 import pandas as pd
-import io
 
 
-class DataPipelineEngine:
-    @classmethod
-    def process_dataset(cls, file_contents: bytes):
-        try:
-            df = pd.read_csv(io.BytesIO(file_contents))
-            if df.empty:
-                return {"status": "error", "message": "Empty dataframe"}
-            return {
-                "status": "success",
-                "row_count": len(df),
-                "column_count": len(df.columns),
-            }
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
+class PipelineError(Exception):
+    """Custom exception raised for pipeline data processing errors."""
+
+    pass
+
+
+def process_pipeline(file_path: str):
+    try:
+        df = pd.read_csv(file_path)
+        row_count, column_count = df.shape
+        return {
+            "status": "success",
+            "row_count": row_count,
+            "column_count": column_count,
+            "message": "Data processed successfully",
+        }
+    except (pd.errors.EmptyDataError, pd.errors.ParserError) as e:
+        raise PipelineError(f"Failed to parse CSV data: {str(e)}")
+    except Exception as e:
+        raise PipelineError(f"Unexpected pipeline error: {str(e)}")
